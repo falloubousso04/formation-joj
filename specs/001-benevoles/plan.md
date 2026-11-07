@@ -72,7 +72,7 @@ Chaque scénario de la spec est prouvé par au moins un test, au niveau le plus 
 
 Cinq tâches, dans l'ordre des couches. Chaque tâche nomme le test à écrire d'abord et cite les scénarios qu'elle couvre ; elle tient dans un commit.
 
-- [ ] T01 [001-AS1, AS7, AS8] Écrire d'abord `domain/slot.spec.ts` (« 001-AS1: opens a slot with its capacity and all places remaining »), puis `packages/shared/src/volunteers.ts`, `domain/volunteers.errors.ts` et `Slot.create()` / `Slot.restore()`
+- [x] T01 [001-AS1, AS7, AS8] Écrire d'abord `domain/slot.spec.ts` (« 001-AS1: opens a slot with its capacity and all places remaining »), puis `packages/shared/src/volunteers.ts`, `domain/volunteers.errors.ts` et `Slot.create()` / `Slot.restore()`
 - [ ] T02 [001-AS2, AS3, AS4, AS9] Écrire d'abord les tests de `slot.register()` dans `domain/slot.spec.ts` et `domain/registration.spec.ts` (« 001-AS4: refuses a registration on a full slot »), puis `domain/registration.ts` et `slot.register()`
 - [ ] T03 [001-AS1, AS2, AS5, AS6] Écrire d'abord `application/volunteers.application.spec.ts` (« 001-AS5: reports an unknown slot as not found »), puis le port `SlotRepository`, son fake en mémoire, `OpenSlot` et `RegisterVolunteer`
 - [ ] T04 [001-AS4] Écrire d'abord `infra/drizzle-slot.repository.int.spec.ts` (« 001-AS4: never stores more registrations than the capacity »), puis `infra/volunteers.schema.ts`, la migration, `infra/slot.mapper.ts` et `DrizzleSlotRepository`
