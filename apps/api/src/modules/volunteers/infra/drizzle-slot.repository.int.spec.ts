@@ -57,6 +57,33 @@ describe('DrizzleSlotRepository (in-memory PGlite, migrations applied)', () => {
     expect(await repository.findById(randomUUID())).toBeNull();
   });
 
+  it('001-AS1: refuses to delete a discipline that has a slot', async () => {
+    const disciplines = new DrizzleDisciplineRepository(connection.db);
+    const judo = Discipline.create({
+      id: randomUUID(),
+      name: 'Judo',
+      category: 'sports-de-combat',
+      now: NOW,
+    });
+    await disciplines.insert(judo);
+    await repository.insert(
+      Slot.create({
+        id: randomUUID(),
+        disciplineId: judo.id,
+        startsAt: new Date('2026-11-01T09:00:00.000Z'),
+        endsAt: new Date('2026-11-01T12:00:00.000Z'),
+        capacity: 2,
+        now: NOW,
+      }),
+    );
+
+    await expect(disciplines.delete(judo.id)).rejects.toMatchObject({
+      code: 'DISCIPLINE_IN_USE',
+      kind: 'CONFLICT',
+    });
+    expect(await disciplines.findById(judo.id)).toEqual(judo);
+  });
+
   it('001-AS2: counts the stored registrations of a slot', async () => {
     const slot = newSlot();
     await repository.insert(slot);

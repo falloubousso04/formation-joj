@@ -2,10 +2,10 @@ import { Inject, Injectable } from '@nestjs/common';
 import { asc, eq } from 'drizzle-orm';
 import type { Database } from '../../../core/database/database';
 import { DATABASE } from '../../../core/database/database.module';
-import { isUniqueViolation } from '../../../core/database/pg-errors';
+import { isForeignKeyViolation, isUniqueViolation } from '../../../core/database/pg-errors';
 import { DisciplineRepository } from '../application/discipline.repository';
 import type { Discipline } from '../domain/discipline';
-import { disciplineNameTaken } from '../domain/disciplines.errors';
+import { disciplineInUse, disciplineNameTaken } from '../domain/disciplines.errors';
 import { toDomain, toRow } from './discipline.mapper';
 import { DISCIPLINES_NAME_KEY, disciplines } from './disciplines.schema';
 
@@ -58,10 +58,16 @@ export class DrizzleDisciplineRepository extends DisciplineRepository {
   }
 
   async delete(id: string): Promise<boolean> {
-    const deleted = await this.db
-      .delete(disciplines)
-      .where(eq(disciplines.id, id))
-      .returning({ id: disciplines.id });
-    return deleted.length > 0;
+    try {
+      const deleted = await this.db
+        .delete(disciplines)
+        .where(eq(disciplines.id, id))
+        .returning({ id: disciplines.id });
+      return deleted.length > 0;
+    } catch (error) {
+      // D'autres tables (les créneaux) référencent encore cette discipline.
+      if (isForeignKeyViolation(error)) throw disciplineInUse(id);
+      throw error;
+    }
   }
 }

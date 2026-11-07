@@ -11,6 +11,8 @@ const DISCIPLINE_ERROR_KINDS = {
   DISCIPLINE_NOT_FOUND: 'NOT_FOUND',
   /** Une discipline porte déjà ce nom. */
   DISCIPLINE_NAME_TAKEN: 'CONFLICT',
+  /** Des créneaux de bénévoles appartiennent encore à cette discipline. */
+  DISCIPLINE_IN_USE: 'CONFLICT',
 } as const satisfies Record<string, ErrorKind>;
 
 export type DisciplineErrorCode = keyof typeof DISCIPLINE_ERROR_KINDS;
@@ -29,4 +31,8 @@ export function disciplineNameTaken(name: string): DisciplineError {
 
 export function disciplineNotFound(id: string): DisciplineError {
   return new DisciplineError('DISCIPLINE_NOT_FOUND', `No discipline with id ${id}`, { id });
+}
+
+export function disciplineInUse(id: string): DisciplineError {
+  return new DisciplineError('DISCIPLINE_IN_USE', `Discipline ${id} still has slots`, { id });
 }

@@ -49,6 +49,27 @@ describe('/api/slots (e2e)', () => {
     });
   });
 
+  it('001-AS1: refuses to delete a discipline that has a slot (409)', async () => {
+    const judo = disciplineSchema.parse(
+      (
+        await api()
+          .post('/api/disciplines')
+          .send({ name: 'Judo', category: 'sports-de-combat' })
+          .expect(201)
+      ).body,
+    );
+    await api()
+      .post('/api/slots')
+      .send({ ...morning(), disciplineId: judo.id })
+      .expect(201);
+
+    const response = await api().delete(`/api/disciplines/${judo.id}`).expect(409);
+
+    expect(response.headers['content-type']).toMatch(/application\/problem\+json/);
+    expect(response.body).toMatchObject({ status: 409, code: 'DISCIPLINE_IN_USE' });
+    await api().get(`/api/disciplines/${judo.id}`).expect(200);
+  });
+
   it('001-AS2: registers a volunteer, one place remains (201)', async () => {
     const slot = await openSlot();
 
