@@ -3,13 +3,16 @@ import { z } from 'zod';
 export const REGISTRATION_NAME_MAX_LENGTH = 100;
 export const REGISTRATION_EMAIL_MAX_LENGTH = 254;
 
+const CAPACITY_MESSAGE = 'Capacity must be at least 1';
+
 /** Corps de `POST /api/slots`. */
 export const openSlotSchema = z
   .object({
     disciplineId: z.uuid(),
     startsAt: z.iso.datetime({ offset: true }),
     endsAt: z.iso.datetime({ offset: true }),
-    capacity: z.int().min(1, 'Capacity must be at least 1'),
+    // Même message pour une capacité non entière que pour une capacité trop petite.
+    capacity: z.int(CAPACITY_MESSAGE).min(1, CAPACITY_MESSAGE),
   })
   .refine((input) => new Date(input.endsAt) > new Date(input.startsAt), {
     message: 'The end must come after the start',

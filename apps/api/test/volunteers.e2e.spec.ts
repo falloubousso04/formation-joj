@@ -95,7 +95,9 @@ describe('/api/slots (e2e)', () => {
       .expect(400);
 
     expect(response.body).toMatchObject({ status: 400, code: 'VALIDATION_FAILED' });
-    expect(response.body.errors).toEqual([expect.objectContaining({ path: 'capacity' })]);
+    expect(response.body.errors).toEqual([
+      expect.objectContaining({ path: 'capacity', message: 'Capacity must be at least 1' }),
+    ]);
   });
 
   it.each([STARTS_AT, '2026-11-01T08:00:00.000Z'])(

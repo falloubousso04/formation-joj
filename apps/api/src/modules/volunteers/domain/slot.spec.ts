@@ -100,7 +100,11 @@ describe('Slot', () => {
   it.each([0, -1, 1.5])('001-AS7: rejects a capacity of %d', (capacity) => {
     expect(() => open({ capacity })).toThrow(VolunteersError);
     expect(() => open({ capacity })).toThrow(
-      expect.objectContaining({ code: 'SLOT_CAPACITY_INVALID', kind: 'VALIDATION' }),
+      expect.objectContaining({
+        code: 'SLOT_CAPACITY_INVALID',
+        kind: 'VALIDATION',
+        message: 'Capacity must be at least 1',
+      }),
     );
   });
 
