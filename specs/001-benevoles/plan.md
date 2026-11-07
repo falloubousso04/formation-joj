@@ -77,3 +77,11 @@ Cinq tâches, dans l'ordre des couches. Chaque tâche nomme le test à écrire d
 - [x] T03 [001-AS1, AS2, AS5, AS6] Écrire d'abord `application/volunteers.application.spec.ts` (« 001-AS5: reports an unknown slot as not found »), puis le port `SlotRepository`, son fake en mémoire, `OpenSlot` et `RegisterVolunteer`
 - [x] T04 [001-AS4] Écrire d'abord `infra/drizzle-slot.repository.int.spec.ts` (« 001-AS4: never stores more registrations than the capacity »), puis `infra/volunteers.schema.ts`, la migration, `infra/slot.mapper.ts` et `DrizzleSlotRepository`
 - [x] T05 [001-AS1, AS2, AS4, AS5, AS6, AS7, AS8, AS9] Écrire d'abord `test/volunteers.e2e.spec.ts` (« 001-AS4: refuses a third volunteer on a slot of capacity 2 (409, SLOT_FULL) »), puis `http/volunteers.controller.ts`, `volunteers.module.ts`, l'export de `DisciplineRepository` et l'import dans `app.module.ts`
+
+## 7. Corrections
+
+### Passage 1
+
+- [ ] T06 [001-AS7] Écrire d'abord dans `test/volunteers.e2e.spec.ts` et `domain/slot.spec.ts` une assertion sur le message « Capacity must be at least 1 » pour 0, -1 et 1,5, puis donner ce message à la règle `z.int()` de `openSlotSchema` (preuve relecteur : `packages/shared/src/volunteers.ts:12`, 1,5 renvoie « Invalid input: expected int, received number »)
+- [ ] T07 [001-AS8] Écrire d'abord dans `test/volunteers.e2e.spec.ts` et `domain/slot.spec.ts` une assertion sur le message « The end must come after the start » (preuve relecteur : `test/volunteers.e2e.spec.ts:101-112`, `domain/slot.spec.ts:107-114` ne vérifient pas le message)
+- [ ] T08 [001-AS1] Écrire d'abord dans `infra/drizzle-slot.repository.int.spec.ts` et `test/volunteers.e2e.spec.ts` un test « 001-AS1: refuses to delete a discipline that has a slot (409) », puis traduire la violation de la clé étrangère `slots_discipline_id_disciplines_id_fk` en `AppError` CONFLICT dans `DrizzleDisciplineRepository.delete()` (preuve relecteur : `DELETE /api/disciplines/:id` d'une discipline avec un créneau renvoie `500 INTERNAL_ERROR`)
