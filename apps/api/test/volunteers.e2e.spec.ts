@@ -109,7 +109,9 @@ describe('/api/slots (e2e)', () => {
         .expect(400);
 
       expect(response.body).toMatchObject({ status: 400, code: 'VALIDATION_FAILED' });
-      expect(response.body.errors).toEqual([expect.objectContaining({ path: 'endsAt' })]);
+      expect(response.body.errors).toEqual([
+        expect.objectContaining({ path: 'endsAt', message: 'The end must come after the start' }),
+      ]);
     },
   );
 

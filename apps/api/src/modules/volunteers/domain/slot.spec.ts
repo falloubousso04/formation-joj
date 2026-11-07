@@ -113,7 +113,11 @@ describe('Slot', () => {
     ['before', new Date('2026-11-01T08:00:00.000Z')],
   ])('001-AS8: rejects an end %s the start', (_label, endsAt) => {
     expect(() => open({ endsAt })).toThrow(
-      expect.objectContaining({ code: 'SLOT_END_NOT_AFTER_START', kind: 'VALIDATION' }),
+      expect.objectContaining({
+        code: 'SLOT_END_NOT_AFTER_START',
+        kind: 'VALIDATION',
+        message: 'The end must come after the start',
+      }),
     );
   });
 });
