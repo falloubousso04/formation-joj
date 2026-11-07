@@ -24,7 +24,8 @@ export class RegisterVolunteer {
       email: input.email,
       now: new Date(),
     });
-    await this.slots.addRegistration(registration);
-    return { registration, remainingPlaces: slot.remainingPlaces };
+    // Les places restantes viennent de l'écriture, pas de la lecture : une autre inscription a pu passer entre-temps.
+    const remainingPlaces = await this.slots.addRegistration(registration);
+    return { registration, remainingPlaces };
   }
 }

@@ -17,13 +17,16 @@ export class InMemorySlotRepository extends SlotRepository {
     this.slots.set(slot.id, this.withCount(slot));
   }
 
-  async addRegistration(registration: Registration): Promise<void> {
-    const slot = await this.findById(registration.slotId);
+  async addRegistration(registration: Registration): Promise<number> {
+    // Lecture, vérification et écriture sans `await` entre elles : comme le verrou du repository
+    // Drizzle, deux inscriptions simultanées comptent l'une après l'autre.
+    const stored = this.slots.get(registration.slotId);
     // Comme la clé étrangère en base : pas d'inscription sur un créneau inexistant.
-    if (!slot) throw slotNotFound(registration.slotId);
-    // Comme le verrou du repository Drizzle : recompte au moment de l'écriture.
+    if (!stored) throw slotNotFound(registration.slotId);
+    const slot = this.withCount(stored);
     if (slot.remainingPlaces <= 0) throw slotFull(slot.id);
     this.registrations.push(Registration.restore(snapshot(registration)));
+    return slot.remainingPlaces - 1;
   }
 
   /** Pour les tests : vérifier que rien n'a été enregistré. */

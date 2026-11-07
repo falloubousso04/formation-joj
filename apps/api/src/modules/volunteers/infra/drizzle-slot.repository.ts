@@ -26,8 +26,8 @@ export class DrizzleSlotRepository extends SlotRepository {
     await this.db.insert(slots).values(toRow(slot));
   }
 
-  async addRegistration(registration: Registration): Promise<void> {
-    await this.db.transaction(async (tx) => {
+  async addRegistration(registration: Registration): Promise<number> {
+    return this.db.transaction(async (tx) => {
       // Verrou sur la ligne du créneau : deux inscriptions simultanées comptent l'une après l'autre.
       const [row] = await tx
         .select({ capacity: slots.capacity })
@@ -35,9 +35,8 @@ export class DrizzleSlotRepository extends SlotRepository {
         .where(eq(slots.id, registration.slotId))
         .for('update');
       if (!row) throw slotNotFound(registration.slotId);
-      if ((await countRegistrations(tx, registration.slotId)) >= row.capacity) {
-        throw slotFull(registration.slotId);
-      }
+      const registered = await countRegistrations(tx, registration.slotId);
+      if (registered >= row.capacity) throw slotFull(registration.slotId);
       await tx.insert(registrations).values({
         id: registration.id,
         slotId: registration.slotId,
@@ -45,6 +44,8 @@ export class DrizzleSlotRepository extends SlotRepository {
         email: registration.email,
         createdAt: registration.createdAt,
       });
+      // Compté sous le verrou : c'est l'état réel après cette inscription.
+      return row.capacity - registered - 1;
     });
   }
 }

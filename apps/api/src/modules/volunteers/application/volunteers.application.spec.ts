@@ -68,6 +68,21 @@ describe('volunteers (application layer)', () => {
     expect((await ctx.slots.findById(slot.id))?.remainingPlaces).toBe(1);
   });
 
+  it('001-AS3: reports 0 remaining places to the last of two simultaneous registrations', async () => {
+    const slot = await ctx.openSlot.execute(MORNING);
+
+    const results = await Promise.all([
+      ctx.registerVolunteer.execute(slot.id, { name: 'Awa Diop', email: 'awa@example.org' }),
+      ctx.registerVolunteer.execute(slot.id, {
+        name: 'Moussa Ndiaye',
+        email: 'moussa@example.org',
+      }),
+    ]);
+
+    expect(results.map((result) => result.remainingPlaces).sort()).toEqual([0, 1]);
+    expect((await ctx.slots.findById(slot.id))?.remainingPlaces).toBe(0);
+  });
+
   it('001-AS5: reports an unknown slot as not found', async () => {
     await expect(
       ctx.registerVolunteer.execute(UNKNOWN_ID, { name: 'Awa Diop', email: 'awa@example.org' }),

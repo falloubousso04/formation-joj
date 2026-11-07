@@ -84,6 +84,18 @@ describe('DrizzleSlotRepository (in-memory PGlite, migrations applied)', () => {
     expect(await disciplines.findById(judo.id)).toEqual(judo);
   });
 
+  it('001-AS3: reports 0 remaining places to the last of two simultaneous registrations', async () => {
+    const slot = newSlot();
+    await repository.insert(slot);
+
+    const remaining = await Promise.all([
+      repository.addRegistration(volunteer(slot.id, 1)),
+      repository.addRegistration(volunteer(slot.id, 2)),
+    ]);
+
+    expect([...remaining].sort()).toEqual([0, 1]);
+  });
+
   it('001-AS2: counts the stored registrations of a slot', async () => {
     const slot = newSlot();
     await repository.insert(slot);

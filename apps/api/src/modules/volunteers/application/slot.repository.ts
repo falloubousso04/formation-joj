@@ -12,6 +12,7 @@ export abstract class SlotRepository {
   /**
    * Enregistre l'inscription ; lève SLOT_FULL si le créneau est déjà plein au moment de l'écriture,
    * pour que deux inscriptions simultanées ne prennent pas la même dernière place.
+   * Renvoie les places restantes comptées au moment de l'écriture, et non celles d'une lecture antérieure.
    */
-  abstract addRegistration(registration: Registration): Promise<void>;
+  abstract addRegistration(registration: Registration): Promise<number>;
 }
