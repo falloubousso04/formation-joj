@@ -1,4 +1,5 @@
-import { VolunteersError } from './volunteers.errors';
+import { type NewRegistration, Registration } from './registration';
+import { slotFull, VolunteersError } from './volunteers.errors';
 
 export interface SlotProps {
   id: string;
@@ -83,4 +84,16 @@ export class Slot {
   get remainingPlaces(): number {
     return this.props.capacity - this.props.registrationCount;
   }
+
+  /** Prend une place ; un créneau complet refuse, et une inscription invalide ne prend rien. */
+  register(volunteer: NewVolunteer): Registration {
+    if (this.remainingPlaces <= 0) {
+      throw slotFull(this.id);
+    }
+    const registration = Registration.create({ ...volunteer, slotId: this.id });
+    this.props = { ...this.props, registrationCount: this.props.registrationCount + 1 };
+    return registration;
+  }
 }
+
+export type NewVolunteer = Omit<NewRegistration, 'slotId'>;
