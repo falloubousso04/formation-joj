@@ -19,5 +19,7 @@ import { DrizzleDisciplineRepository } from './infra/drizzle-discipline.reposito
     UpdateDiscipline,
     DeleteDiscipline,
   ],
+  // Lu par le module volunteers pour vérifier qu'une discipline existe.
+  exports: [DisciplineRepository],
 })
 export class DisciplinesModule {}
